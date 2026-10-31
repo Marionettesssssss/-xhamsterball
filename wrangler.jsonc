@@ -1,0 +1,12 @@
+{
+  "name": "xhamsterball",
+  "pages_build_output_dir": ".",
+  "compatibility_date": "2026-10-31",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "hammy-leaderboard",
+      "database_id": "019567b4-a818-41df-92bc-8302fe200e8a"
+    }
+  ]
+}
