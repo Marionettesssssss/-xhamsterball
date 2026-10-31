@@ -29,15 +29,16 @@ export async function onRequest({request,env}){
  return json({token,started:now},201,{'Set-Cookie':`hammy_player=${player}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=31536000`});}
  const maxGems=8+Math.floor(input.level*.5),minimum=Math.floor(maxGems*8/14*700);
  if(typeof input.token!=='string'||input.token.length>100||!Number.isInteger(input.time_ms)||input.time_ms<minimum||input.time_ms>3600000||!Number.isInteger(input.crystals)||input.crystals<0||input.crystals>maxGems)return json({error:'สถิติไม่ผ่านการตรวจสอบ'},400);
- const token=await digest(input.token);const run=await env.DB.prepare('SELECT * FROM runs WHERE token=? AND player=? AND level=? AND version=? AND used=0').bind(token,player,input.level,VERSION).first();if(!run||now-run.started>3600000||input.time_ms>now-run.started+1500)return json({error:'รอบเล่นหมดอายุ ถูกใช้แล้ว หรือเวลาไม่ตรงกับรอบที่เริ่ม'},400);
+ const token=await digest(input.token);const run=await env.DB.prepare('SELECT * FROM runs WHERE token=? AND player=? AND level=? AND version=?').bind(token,player,input.level,VERSION).first();if(!run||now-run.started>3600000||input.time_ms>now-run.started+1500)return json({error:'รอบเล่นหมดอายุ ถูกใช้แล้ว หรือเวลาไม่ตรงกับรอบที่เริ่ม'},400);
  // Claim the run and publish in one atomic D1 batch. The score insert is conditional
  // on this request's unique claim timestamp, so concurrent replays cannot submit twice.
+ if(run.used!==0)return json({saved:true,alreadySubmitted:true});
  const claim=crypto.randomUUID();const results=await env.DB.batch([
  env.DB.prepare('UPDATE runs SET used=? WHERE token=? AND used=0').bind(claim,token),
  env.DB.prepare(`INSERT INTO scores(player,name,level,version,time_ms,crystals,created)
  SELECT player,name,level,version,?,?,? FROM runs WHERE token=? AND used=?
  ON CONFLICT(player,level,version) DO UPDATE SET name=excluded.name,time_ms=excluded.time_ms,crystals=excluded.crystals,created=excluded.created
  WHERE excluded.time_ms<scores.time_ms OR (excluded.time_ms=scores.time_ms AND excluded.crystals>scores.crystals)`).bind(input.time_ms,input.crystals,now,token,claim)
- ]);if(!results[0].meta?.changes)return json({error:'รอบนี้ถูกส่งคะแนนแล้ว'},409);return json({saved:true});
+ ]);if(!results[0].meta?.changes)return json({saved:true,alreadySubmitted:true});return json({saved:true});
  }catch(e){console.error('Leaderboard request failed:',e.message);return json({error:e instanceof SyntaxError?'ข้อมูล JSON ไม่ถูกต้อง':'ไม่สามารถบันทึกหรืออ่านอันดับได้ในขณะนี้'},e instanceof SyntaxError?400:500)}
 }
