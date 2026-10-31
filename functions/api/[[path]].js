@@ -1,4 +1,4 @@
-const VERSION='hammy-3d-v1';
+const VERSION='hammy-pocket-v2';
 const json=(value,status=200,headers={})=>Response.json(value,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff',...headers}});
 let schemaDB=null,schemaPromise=null;
 async function ensureSchema(db){if(schemaDB!==db){schemaDB=db;schemaPromise=null}if(!schemaPromise)schemaPromise=db.batch([
