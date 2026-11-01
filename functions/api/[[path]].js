@@ -1,4 +1,4 @@
-const VERSION='hammy-garden-v4';const LEVEL_GEMS=[9,10,10,10,11,11,12,12,12,13,13,14,14,14,14,14,15,15,16,20];const validVersion=v=>v===VERSION||v==='hammy-garden-v3'||v==='hammy-pocket-v2';
+const VERSION='hammy-garden-v5';const LEVEL_GEMS=[9,10,10,10,11,11,12,12,12,13,13,14,14,14,14,14,15,15,16,20];const validVersion=v=>v===VERSION||v==='hammy-garden-v4'||v==='hammy-garden-v3'||v==='hammy-pocket-v2';
 const json=(value,status=200,headers={})=>Response.json(value,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff',...headers}});
 let schemaDB=null,schemaPromise=null;
 async function ensureSchema(db){if(schemaDB!==db){schemaDB=db;schemaPromise=null}if(!schemaPromise)schemaPromise=db.batch([
