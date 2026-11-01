@@ -1,4 +1,4 @@
-const VERSION='hammy-garden-v3';const LEVEL_GEMS=[9,10,10,10,11,11,12,12,12,13,13,14,14,14,14,14,15,15,16,20];const validVersion=v=>v===VERSION||v==='hammy-pocket-v2';
+const VERSION='hammy-garden-v4';const LEVEL_GEMS=[9,10,10,10,11,11,12,12,12,13,13,14,14,14,14,14,15,15,16,20];const validVersion=v=>v===VERSION||v==='hammy-garden-v3'||v==='hammy-pocket-v2';
 const json=(value,status=200,headers={})=>Response.json(value,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff',...headers}});
 let schemaDB=null,schemaPromise=null;
 async function ensureSchema(db){if(schemaDB!==db){schemaDB=db;schemaPromise=null}if(!schemaPromise)schemaPromise=db.batch([
@@ -27,7 +27,7 @@ export async function onRequest({request,env}){
  const rate=await env.DB.prepare('SELECT COUNT(*) AS count FROM runs WHERE ip_hash=? AND started>?').bind(ipHash,now-60000).first();if(rate.count>=30)return json({error:'Too many runs. Please wait a moment'},429);
  const token=crypto.randomUUID()+crypto.randomUUID();await env.DB.batch([env.DB.prepare('DELETE FROM runs WHERE started<?').bind(now-86400000),env.DB.prepare('INSERT INTO runs(token,player,name,level,version,started,ip_hash) VALUES(?,?,?,?,?,?,?)').bind(await digest(token),player,name,input.level,input.version,now,ipHash)]);
  return json({token,started:now},201,{'Set-Cookie':`hammy_player=${player}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=31536000`});}
- const maxGems=input.version===VERSION?LEVEL_GEMS[input.level-1]:8+Math.floor(input.level*.5),minimum=Math.floor(maxGems*8/18*600);
+ const maxGems=input.version==='hammy-pocket-v2'?8+Math.floor(input.level*.5):LEVEL_GEMS[input.level-1],minimum=Math.floor(maxGems*8/18*600);
  if(typeof input.token!=='string'||input.token.length>100||!Number.isInteger(input.time_ms)||input.time_ms<minimum||input.time_ms>3600000||!Number.isInteger(input.crystals)||input.crystals<0||input.crystals>maxGems)return json({error:'Score validation failed'},400);
  const token=await digest(input.token);const run=await env.DB.prepare('SELECT * FROM runs WHERE token=? AND player=? AND level=? AND version=?').bind(token,player,input.level,input.version).first();if(!run||now-run.started>3600000||input.time_ms>now-run.started+1500)return json({error:'Run expired, already used, or timing does not match'},400);
  // Claim the run and publish in one atomic D1 batch. The score insert is conditional
