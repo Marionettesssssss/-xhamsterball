@@ -18,3 +18,9 @@ html,body.game-app{width:100%;height:100%;margin:0;overflow:hidden;overscroll-be
 .game-app .star-objective{color:#cbd6cb}.game-app .star-objective.earned{color:#edf5d4}.game-app .star-results .star-best{color:#ccd9c5}.game-app .overlay[data-state="won"]{backdrop-filter:none;background:linear-gradient(90deg,#183e35ed,#183e35b0 43%,#183e3524 70%);align-items:flex-start;text-align:left;padding-left:10%}.game-app .overlay[data-state="won"] .orb-icon{display:none}.game-app .overlay[data-state="won"] .result-stars{text-align:left}.game-app .overlay[data-state="won"] .star-best{text-align:left}@media(max-width:700px){.game-app .overlay[data-state="won"]{align-items:center;text-align:center;padding:90px 20px 20px;justify-content:flex-start;background:linear-gradient(#183e35df,#183e35cc 52%,#183e3520 80%)}.game-app .overlay[data-state="won"] .result-stars,.game-app .overlay[data-state="won"] .star-best{text-align:center}}
 
 body:has(#overlay[data-state="won"]:not([hidden])) :is(.hud,.progress,.stage-banner,.touch,.game-bottom){visibility:hidden}
+
+.game-app dialog#wardrobeDialog{overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}.game-app #wardrobeDialog .dialog-title{position:sticky;top:0;background:#fff8e9;z-index:2;padding-bottom:8px}body:has(#wardrobeDialog[open]) #menuShade{backdrop-filter:none;background:#183e3512}
+
+.game-app #wardrobeDialog .dialog-title::before{content:'';position:absolute;left:-24px;right:-24px;top:-28px;bottom:0;background:#fff8e9;z-index:-1}
+
+body[data-world="moon"] .game-app{color:#dbeff1}body[data-world="moon"] .stage-banner,body[data-world="moon"] .stage-banner .mini,body[data-world="moon"] .stage-banner h2,body[data-world="moon"] .stage-banner h2 span,body[data-world="moon"] .hud,body[data-world="moon"] .hud .ghost-status,body[data-world="moon"] .player-tag{color:#dceff0}body[data-world="moon"] .stage-banner .level-goals{color:#ffe4a5}body[data-world="moon"] #controlStatus{color:#c1d6db}
